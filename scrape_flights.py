@@ -19,6 +19,8 @@ mission_default = {
     "description":"None"
 }
 
+missions = list()
+
 # usage function
 
 def usage(status=0):
@@ -61,7 +63,6 @@ def get_JSON(input_url, input_header):
     # extract the date, name, and vehicle
     for datename in soup.find_all('div', class_='datename'):
         tmp_dict = {}
-        tmp_dict = mission_default
 
         # the vehicle and name are separated by a bullet point
         combined = datename.find('span',
@@ -71,11 +72,24 @@ def get_JSON(input_url, input_header):
         tmp_dict['name'] = combined[1].strip()
         tmp_dict['date'] = datename.find('span',
                 class_='launchdate').get_text()
-        # print tmp_dict
+        missions.append(tmp_dict)
 
-        print tmp_dict['vehicle']
-        print tmp_dict['name']
-        print tmp_dict['date']
+    # extract the launch time and site
+    i = 0
+    for timesite in soup.find_all('div', class_='missiondata'):
+
+        combined= timesite.get_text().split('\n')
+
+        ##TODO: handle 'approx.' times here
+        missions[i]['time'] = combined[0].split(':')[1].strip().split(' ')[0].strip()
+
+        missions[i]['location'] = combined[1].split(':')[1].strip()
+        i = i+1
+
+    print missions
+
+
+
 
 
 get_JSON(URL, headers)
