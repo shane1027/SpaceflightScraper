@@ -6,10 +6,18 @@ import requests
 import os
 import re
 import sys
+from bs4 import BeautifulSoup
 
-# set some defaults
+# set default mission dictionary format
 
-LIMIT=10
+mission_default = {
+    "date":"None",
+    "vehicle":"None",
+    "location":"None:",
+    "name":"None",
+    "time":"None",
+    "description":"None"
+}
 
 # usage function
 
@@ -38,6 +46,7 @@ headers = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0)\
 # function to obtain the necessary JSON data
 def get_JSON(input_url, input_header):
 
+    # scrape webpage information
     response = requests.get(input_url, headers=input_header)
 
     if response.status_code != 200:
@@ -46,7 +55,27 @@ def get_JSON(input_url, input_header):
     else:
         print 'reached ' + URL + ' successfully'
 
-    print response.text
+    # transform into useful content
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    # extract the date, name, and vehicle
+    for datename in soup.find_all('div', class_='datename'):
+        tmp_dict = {}
+        tmp_dict = mission_default
+
+        # the vehicle and name are separated by a bullet point
+        combined = datename.find('span',
+            class_='mission').get_text().split(u"\u2022")
+
+        tmp_dict['vehicle'] = combined[0].strip()
+        tmp_dict['name'] = combined[1].strip()
+        tmp_dict['date'] = datename.find('span',
+                class_='launchdate').get_text()
+        # print tmp_dict
+
+        print tmp_dict['vehicle']
+        print tmp_dict['name']
+        print tmp_dict['date']
 
 
 get_JSON(URL, headers)
