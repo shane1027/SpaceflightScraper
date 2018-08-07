@@ -2,6 +2,8 @@
 
 ### okay, here are some thoughts on the vision of this application:
 
+- add export to google calendar functionality
+
 - poll spaceflightnow every 15 min using this program hosted on AWS
 - push out new launches to all devices (w/ option to unsub), and changes to a
   launch to any upcoming launch that a user is subscribed to
